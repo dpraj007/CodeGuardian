@@ -1,11 +1,8 @@
-<!-- 
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/> 
     <title>CodeGuardian - Security Analysis Tool</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -46,6 +43,8 @@
             margin-bottom: 3rem;
             font-size: 1.1rem;
             line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto 3rem auto;
         }
 
         form {
@@ -54,6 +53,7 @@
             border-radius: 1rem;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 3rem;
         }
 
         label {
@@ -61,6 +61,7 @@
             margin-bottom: 1rem;
             font-weight: 500;
             color: #e2e8f0;
+            text-align: left;
         }
 
         input {
@@ -120,13 +121,14 @@
             padding: 1rem;
             display: none;
         }
+
         .report-item {
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 8px;
-        padding: 20px;
-        margin: 15px 0;
-        border-left: 4px solid #4facfe;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #4facfe;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         .report-content {
@@ -150,37 +152,7 @@
         .severity-medium { border-left-color: #f6e05e; }
         .severity-low { border-left-color: #68d391; }
 
-        /* Style for bullet points */
-        .report-content br + li {
-            display: inline-block;
-            margin-left: 1em;
-        }
-        .repo-type-selector {
-        margin-bottom: 2rem;
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        }
-
-        .repo-type-btn {
-            background: rgba(255, 255, 255, 0.05);
-            color: #a0aec0;
-            padding: 0.75rem 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .repo-type-btn.active {
-            background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
-            color: #fff;
-            border: none;
-        }
-
-        #localFileInput {
-            display: none;
-        }
+        /* Loading spinner */
         .loading {
             text-align: center;
             padding: 2rem;
@@ -215,8 +187,40 @@
             margin-top: 1rem;
         }
 
-        
-        
+        /* Additional styling for links */
+        a {
+            color: #4facfe;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        h2 {
+            margin-top: 3rem;
+            font-size: 1.5rem;
+            text-align: center;
+            background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .pdf-container {
+            margin-top: 2rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        #pdfViewer {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            backdrop-filter: blur(10px);
+        }
     </style>
 </head>
 <body>
@@ -224,720 +228,198 @@
         <h1>CodeGuardian</h1>
         <p class="description">
             Secure your code with our advanced AI-powered vulnerability scanner. 
-            Enter your GitHub repository URL or local path below to begin analysis.
+            Enter your repository URL or local path below and let our system automatically detect and analyze it.
         </p>
         
-        <form>
-            <div class="repo-type-selector">
-                <button type="button" class="repo-type-btn active" data-type="github">GitHub Repository</button>
-                <button type="button" class="repo-type-btn" data-type="local">Local Repository</button>
-            </div>
-        
-            <div id="githubInput">
-                <label for="pathInput">GitHub Repository URL</label>
-                <input 
-                    type="text" 
-                    id="pathInput" 
-                    name="path" 
-                    placeholder="e.g., https://github.com/username/repo" 
-                    required
-                >
-            </div>
-        
-            <div id="localInput" style="display: none;">
-                <label for="localFileInput">Select Local Repository</label>
-                <input 
-                    type="file" 
-                    id="localFileInput" 
-                    webkitdirectory 
-                    directory
-                >
-                <input 
-                    type="text" 
-                    id="localPathInput" 
-                    readonly 
-                    placeholder="Select a local repository"
-                    required
-                >
-            </div>
-        
+        <form id="analysisForm">
+            <label for="pathInput">Repository URL or Local Path</label>
+            <input 
+                type="text" 
+                id="pathInput" 
+                name="path" 
+                placeholder="e.g., https://github.com/username/repo or /path/to/local/repo" 
+                required
+            >
             <button type="submit">Analyze Code</button>
         </form>
+        
+        <h2>Your Reports</h2>
+        <a id="downloadPdfLink" href="http://localhost:4321/" style="display: block; margin-top: 1rem;">View Reports</a>
+        <h2>Chat About Your Reports</h2>
+        <a href="http://localhost:3000/" style="display: block; margin-top: 1rem;">Chat</a>
         
         <div class="results-container">
             <div class="reports"></div>
         </div>
+
+        <div class="pdf-container" style="display:none;">
+            <iframe id="pdfViewer" src="" width="100%" height="600px" style="border: none;"></iframe>
+        </div>
+
         <div class="error"></div>
     </div>
 
     <script>
         let currentEventSource = null;
+        const form = document.getElementById('analysisForm');
 
-        function showError(message) {
-            const errorDiv = document.querySelector('.error');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-        }
-
-        function addReportItem(report) {
-            const reportsContainer = document.querySelector('.reports');
-            
-            // Create report element
-            const reportElement = document.createElement('div');
-            reportElement.className = 'report-item';
-            
-            // Determine severity from content
-            const severityMatch = report.content.match(/risk assessment:\s*\*?\*?(High|Medium|Low)/i);
-            const severity = severityMatch ? severityMatch[1].toLowerCase() : 'medium';
-            reportElement.classList.add(`severity-${severity}`);
-            
-            // Format the content
-            const formattedContent = report.content
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Handle bold text
-                .replace(/\n/g, '<br>')  // Convert newlines to <br>
-                .replace(/•/g, '&bull;'); // Convert bullet points
-            
-            reportElement.innerHTML = `
-                <h3>${report.file}</h3>
-                <div class="report-content">
-                    ${formattedContent}
-                </div>
-            `;
-            
-            reportsContainer.appendChild(reportElement);
-            reportElement.scrollIntoView({ behavior: 'smooth' });
-        }
+        form.addEventListener('submit', submitForm);
 
         function submitForm(event) {
-                event.preventDefault();
+            event.preventDefault();
 
-                // Close any existing connection
-                if (currentEventSource) {
-                    currentEventSource.close();
-                    currentEventSource = null;
-                }
+            // Close any existing connection
+            if (currentEventSource) {
+                currentEventSource.close();
+                currentEventSource = null;
+            }
 
-                // Determine which type is active and get the appropriate input
-                const isGithub = document.querySelector('.repo-type-btn[data-type="github"]').classList.contains('active');
-                const inputPath = isGithub ? 
-                    document.getElementById("pathInput").value : 
-                    document.getElementById("localPathInput").value;
+            const inputPath = document.getElementById("pathInput").value;
+            if (!inputPath) {
+                showError("Please provide a valid repository path");
+                return;
+            }
 
-                // Validate input
-                if (!inputPath) {
-                    showError("Please provide a valid repository path");
-                    return;
-                }
+            const resultsContainer = document.querySelector('.results-container');
+            const reportsContainer = document.querySelector('.reports');
+            const submitButton = form.querySelector('button[type="submit"]');
+            const errorDiv = document.querySelector('.error');
 
-                // Validate GitHub URL format if GitHub is selected
-                if (isGithub && !inputPath.match(/^https:\/\/github\.com\/[\w-]+\/[\w-]+/)) {
-                    showError("Please enter a valid GitHub repository URL");
-                    return;
-                }
+            // Disable submit button during analysis
+            submitButton.disabled = true;
 
-                const resultsContainer = document.querySelector('.results-container');
-                const reportsContainer = document.querySelector('.reports');
-                const submitButton = document.querySelector('button[type="submit"]');
-                const errorDiv = document.querySelector('.error');
+            // Reset UI
+            clearError();
+            resultsContainer.style.display = 'block';
+            reportsContainer.innerHTML = '';
 
-                // Disable submit button during analysis
-                submitButton.disabled = true;
+            // Add loading indicator
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading';
+            loadingDiv.textContent = 'Analyzing repository...';
+            reportsContainer.appendChild(loadingDiv);
 
-                // Reset UI
-                errorDiv.style.display = 'none';
-                errorDiv.textContent = '';
-                resultsContainer.style.display = 'block';
-                reportsContainer.innerHTML = '';
+            try {
+                const url = 'http://127.0.0.1:8000/submit/analyze/';
+                const params = new URLSearchParams({ path: inputPath });
 
-                // Add loading indicator
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'loading';
-                loadingDiv.textContent = 'Analyzing repository...';
-                reportsContainer.appendChild(loadingDiv);
+                currentEventSource = new EventSource(`${url}?${params.toString()}`);
 
-                try {
-                    const url = 'http://127.0.0.1:8000/submit/analyze/';
-                    const params = new URLSearchParams({
-                        path: inputPath,
-                        type: isGithub ? 'github' : 'local'
-                    });
+                currentEventSource.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
 
-                    currentEventSource = new EventSource(`${url}?${params.toString()}`);
+                    if (data.error) {
+                        showError(data.error);
+                        closeConnection();
+                        return;
+                    }
 
-                    currentEventSource.onmessage = function(event) {
-                        // Remove loading indicator if it exists
+                    if (data.report) {
+                        // Keep the loading indicator while processing reports
+                        addReportItem(data.report);
+                    }
+
+                    if (data.completed) {
+                        // Remove loading indicator when analysis is complete
                         const loadingElement = document.querySelector('.loading');
                         if (loadingElement) {
                             loadingElement.remove();
                         }
 
-                        const data = JSON.parse(event.data);
+                        // Add completion message
+                        const completionDiv = document.createElement('div');
+                        completionDiv.className = 'completion-message';
+                        completionDiv.textContent = 'Analysis completed!';
+                        completionDiv.style.color = '#68d391';
+                        completionDiv.style.marginTop = '1rem';
+                        completionDiv.style.textAlign = 'center';
+                        reportsContainer.appendChild(completionDiv);
 
-                        if (data.error) {
-                            showError(data.error);
-                            closeConnection();
-                            return;
-                        }
+                        // Show PDF viewer and download link
+                        const pdfContainer = document.querySelector('.pdf-container');
+                        const pdfViewer = document.getElementById('pdfViewer');
+                        const downloadPdfLink = document.getElementById('downloadPdfLink');
 
-                        if (data.report) {
-                            addReportItem(data.report);
-                        }
+                        // Assuming your backend serves the PDF at /static/final_report.pdf
+                        const pdfUrl = '/static/final_report.pdf';
 
-                        if (data.completed) {
-                            // Add completion message
-                            const completionDiv = document.createElement('div');
-                            completionDiv.className = 'completion-message';
-                            completionDiv.textContent = 'Analysis completed!';
-                            completionDiv.style.color = '#68d391';
-                            completionDiv.style.marginTop = '1rem';
-                            completionDiv.style.textAlign = 'center';
-                            reportsContainer.appendChild(completionDiv);
-                            closeConnection();
-                        }
-                    };
+                        pdfViewer.src = pdfUrl;
+                        downloadPdfLink.href = pdfUrl;
 
-                    currentEventSource.onerror = function(error) {
-                        showError("Connection error occurred. Please try again.");
+                        pdfContainer.style.display = 'block';
+
                         closeConnection();
-                    };
-
-                } catch (error) {
-                    showError("Failed to start analysis: " + error.message);
-                    closeConnection();
-                }
-
-                function closeConnection() {
-                    if (currentEventSource) {
-                        currentEventSource.close();
-                        currentEventSource = null;
                     }
-                    submitButton.disabled = false;
-                    
-                    // Remove loading indicator if it exists
-                    const loadingElement = document.querySelector('.loading');
-                    if (loadingElement) {
-                        loadingElement.remove();
-                    }
-                }
-            }
+                };
 
-            // Helper function to show errors
-            function showError(message) {
-                const errorDiv = document.querySelector('.error');
-                errorDiv.textContent = message;
-                errorDiv.style.display = 'block';
-                errorDiv.style.padding = '1rem';
-                errorDiv.style.marginTop = '1rem';
-                errorDiv.style.backgroundColor = 'rgba(252, 129, 129, 0.1)';
-                errorDiv.style.border = '1px solid rgba(252, 129, 129, 0.2)';
-                errorDiv.style.borderRadius = '0.5rem';
-            }
-
-// Add these styles to your existing CSS
-    </script>
-</body>
-</html> -->
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeGuardian - Security Analysis Tool</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 2rem;
-        }
-
-        .container {
-            max-width: 800px;
-            width: 100%;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .description {
-            color: #a0aec0;
-            margin-bottom: 3rem;
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-
-        form {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 2rem;
-            border-radius: 1rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        label {
-            display: block;
-            margin-bottom: 1rem;
-            font-weight: 500;
-            color: #e2e8f0;
-        }
-
-        input {
-            width: 100%;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 0.5rem;
-            color: #fff;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #4facfe;
-            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.3);
-        }
-
-        button {
-            background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
-            color: #fff;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-        }
-
-        .loading {
-            display: none;
-            margin-top: 1rem;
-            color: #a0aec0;
-        }
-
-        .error {
-            color: #fc8181;
-            margin-top: 1rem;
-            display: none;
-        }
-
-        .results-container {
-            margin-top: 2rem;
-            width: 100%;
-            max-width: 800px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 1rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1rem;
-            display: none;
-        }
-        .report-item {
-        background: rgba(255, 255, 255, 0.03);
-        border-radius: 8px;
-        padding: 20px;
-        margin: 15px 0;
-        border-left: 4px solid #4facfe;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        .report-content {
-            white-space: pre-wrap;
-            line-height: 1.6;
-            color: #e2e8f0;
-        }
-
-        .report-item h3 {
-            margin: 0 0 15px 0;
-            color: #fff;
-            font-size: 1.2rem;
-        }
-
-        .report-content strong {
-            color: #fff;
-            font-weight: 600;
-        }
-
-        .severity-high { border-left-color: #fc8181; }
-        .severity-medium { border-left-color: #f6e05e; }
-        .severity-low { border-left-color: #68d391; }
-
-        /* Style for bullet points */
-        .report-content br + li {
-            display: inline-block;
-            margin-left: 1em;
-        }
-        .repo-type-selector {
-        margin-bottom: 2rem;
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        }
-
-        .repo-type-btn {
-            background: rgba(255, 255, 255, 0.05);
-            color: #a0aec0;
-            padding: 0.75rem 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .repo-type-btn.active {
-            background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
-            color: #fff;
-            border: none;
-        }
-
-        #localFileInput {
-            display: none;
-        }
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: #a0aec0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-        }
-
-        .loading::after {
-            content: '';
-            width: 1rem;
-            height: 1rem;
-            border: 2px solid #4facfe;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .completion-message {
-            font-weight: 500;
-            padding: 1rem;
-            background: rgba(104, 211, 145, 0.1);
-            border-radius: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        
-        
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>CodeGuardian</h1>
-        <p class="description">
-            Secure your code with our advanced AI-powered vulnerability scanner. 
-            Enter your GitHub repository URL or select a local path below to begin analysis.
-        </p>
-        
-        <form id="analysisForm">
-            <div class="repo-type-selector">
-                <button type="button" class="repo-type-btn active" data-type="github">GitHub Repository</button>
-                <button type="button" class="repo-type-btn" data-type="local">Local Repository</button>
-            </div>
-        
-            <div id="githubInput">
-                <label for="pathInput">GitHub Repository URL</label>
-                <input 
-                    type="text" 
-                    id="pathInput" 
-                    name="path" 
-                    placeholder="e.g., https://github.com/username/repo" 
-                    required
-                >
-            </div>
-        
-            <div id="localInput" style="display: none;">
-                <label for="localFileInput">Select Local Repository</label>
-                <input 
-                    type="file" 
-                    id="localFileInput" 
-                    webkitdirectory 
-                    directory
-                >
-                <input 
-                    type="text" 
-                    id="localPathInput" 
-                    readonly 
-                    placeholder="Select a local repository"
-                    required
-                >
-            </div>
-        
-            <button type="submit">Analyze Code</button>
-        </form>
-        <h2>Your Reports Will be displayed here</h2>
-        <a id="downloadPdfLink" href="http://localhost:4321/"  style="display: block; margin-top: 1rem;">View Reports</a>
-
-        <h2  href="http://localhost:3000/">CHAT WITH YOUR REPORTS !!</h2>
-            <a id="downloadPdfLink" href="http://localhost:3000/"  style="display: block; margin-top: 1rem;">CHAT</a>
-        
-        <div class="results-container" style="display:none;">
-            <div class="reports"></div>
-        </div>
-        
-        <div class="" >
-            
-
-            
-
-
-            <iframe id="pdfViewer" src="" width="100%" height="600px" style="border: none;"></iframe>
-            <div class="error"></div>
-        </div>
-    </div>
-
-   <!-- Updated JavaScript code in index.html -->
-<script>
-    let currentEventSource = null;
-
-    // Toggle between GitHub and Local inputs
-    const githubBtn = document.querySelector('.repo-type-btn[data-type="github"]');
-    const localBtn = document.querySelector('.repo-type-btn[data-type="local"]');
-    const githubInput = document.getElementById('githubInput');
-    const localInput = document.getElementById('localInput');
-    const localFileInput = document.getElementById('localFileInput');
-    const localPathInput = document.getElementById('localPathInput');
-
-    githubBtn.addEventListener('click', () => {
-        githubBtn.classList.add('active');
-        localBtn.classList.remove('active');
-        githubInput.style.display = 'block';
-        localInput.style.display = 'none';
-        clearError();
-    });
-
-    localBtn.addEventListener('click', () => {
-        localBtn.classList.add('active');
-        githubBtn.classList.remove('active');
-        githubInput.style.display = 'none';
-        localInput.style.display = 'block';
-        clearError();
-    });
-
-    // Update local path input when a directory is selected
-    localFileInput.addEventListener('change', () => {
-        if (localFileInput.files.length > 0) {
-            // Display the directory name selected
-            const fullPath = localFileInput.files[0].webkitRelativePath;
-            const directoryName = fullPath.split('/')[0];
-            localPathInput.value = directoryName;
-        } else {
-            localPathInput.value = '';
-        }
-    });
-
-    // Handle form submission
-    const form = document.getElementById('analysisForm');
-    form.addEventListener('submit', submitForm);
-
-    function submitForm(event) {
-        event.preventDefault();
-
-        // Close any existing connection
-        if (currentEventSource) {
-            currentEventSource.close();
-            currentEventSource = null;
-        }
-
-        // Determine which type is active and get the appropriate input
-        const isGithub = githubBtn.classList.contains('active');
-        const inputPath = isGithub ?
-            document.getElementById("pathInput").value :
-            document.getElementById("localPathInput").value;
-
-        // Validate input
-        if (!inputPath) {
-            showError("Please provide a valid repository path");
-            return;
-        }
-
-        // Validate GitHub URL format if GitHub is selected
-        if (isGithub && !inputPath.match(/^https:\/\/github\.com\/[\w-]+\/[\w-]+/)) {
-            showError("Please enter a valid GitHub repository URL");
-            return;
-        }
-
-        const resultsContainer = document.querySelector('.results-container');
-        const reportsContainer = document.querySelector('.reports');
-        const submitButton = form.querySelector('button[type="submit"]');
-
-        // Disable submit button during analysis
-        submitButton.disabled = true;
-
-        // Reset UI
-        clearError();
-        resultsContainer.style.display = 'block';
-        reportsContainer.innerHTML = '';
-
-        // Add loading indicator
-        const loadingDiv = document.createElement('div');
-        loadingDiv.className = 'loading';
-        loadingDiv.textContent = 'Analyzing repository...';
-        reportsContainer.appendChild(loadingDiv);
-
-        try {
-            const url = 'http://127.0.0.1:8000/submit/analyze/';
-            const params = new URLSearchParams({
-                path: inputPath,
-                type: isGithub ? 'github' : 'local'
-            });
-
-            currentEventSource = new EventSource(`${url}?${params.toString()}`);
-
-            currentEventSource.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-
-                if (data.error) {
-                    showError(data.error);
+                currentEventSource.onerror = function() {
+                    showError("Connection error occurred. Please try again.");
                     closeConnection();
-                    return;
-                }
+                };
 
-                if (data.report) {
-                    // Keep the loading indicator while processing reports
-                    addReportItem(data.report);
-                }
-
-                if (data.completed) {
-                    // Remove loading indicator when analysis is complete
-                    const loadingElement = document.querySelector('.loading');
-                    if (loadingElement) {
-                        loadingElement.remove();
-                    }
-
-                    // Add completion message
-                    const completionDiv = document.createElement('div');
-                    completionDiv.className = 'completion-message';
-                    completionDiv.textContent = 'Analysis completed!';
-                    completionDiv.style.color = '#68d391';
-                    completionDiv.style.marginTop = '1rem';
-                    completionDiv.style.textAlign = 'center';
-                    reportsContainer.appendChild(completionDiv);
-
-                    // Show PDF viewer and download link
-                    const pdfContainer = document.querySelector('.pdf-container');
-                    const pdfViewer = document.getElementById('pdfViewer');
-                    const downloadPdfLink = document.getElementById('downloadPdfLink');
-
-                    // Assuming your backend serves the PDF at /static/final_report.pdf
-                    const pdfUrl = '/static/final_report.pdf';
-
-                    pdfViewer.src = pdfUrl;
-                    downloadPdfLink.href = pdfUrl;
-
-                    pdfContainer.style.display = 'block';
-
-                    closeConnection();
-                }
-            };
-
-            currentEventSource.onerror = function() {
-                showError("Connection error occurred. Please try again.");
+            } catch (error) {
+                showError("Failed to start analysis: " + error.message);
                 closeConnection();
-            };
-
-        } catch (error) {
-            showError("Failed to start analysis: " + error.message);
-            closeConnection();
-        }
-
-        function closeConnection() {
-            if (currentEventSource) {
-                currentEventSource.close();
-                currentEventSource = null;
             }
-            submitButton.disabled = false;
-            // Remove loading indicator if it exists
-            const loadingElement = document.querySelector('.loading');
-            if (loadingElement) {
-                loadingElement.remove();
+
+            function closeConnection() {
+                if (currentEventSource) {
+                    currentEventSource.close();
+                    currentEventSource = null;
+                }
+                submitButton.disabled = false;
+                // Remove loading indicator if it exists
+                const loadingElement = document.querySelector('.loading');
+                if (loadingElement) {
+                    loadingElement.remove();
+                }
             }
         }
-    }
 
-    function addReportItem(report) {
-        const reportsContainer = document.querySelector('.reports');
+        function addReportItem(report) {
+            const reportsContainer = document.querySelector('.reports');
 
-        const reportElement = document.createElement('div');
-        reportElement.className = 'report-item';
+            const reportElement = document.createElement('div');
+            reportElement.className = 'report-item';
 
-        // Attempt to detect severity
-        const severityMatch = report.content.match(/risk assessment:\s*\*?\*?(High|Medium|Low)/i);
-        const severity = severityMatch ? severityMatch[1].toLowerCase() : 'medium';
+            // Attempt to detect severity
+            const severityMatch = report.content.match(/risk assessment:\s*\*?\*?(High|Medium|Low)/i);
+            const severity = severityMatch ? severityMatch[1].toLowerCase() : 'medium';
 
-        // Apply severity class
-        reportElement.classList.add(`severity-${severity}`);
+            // Apply severity class
+            reportElement.classList.add(`severity-${severity}`);
 
-        // Format the content
-        const formattedContent = report.content
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\n/g, '<br>')
-            .replace(/•/g, '&bull;');
+            // Format the content
+            const formattedContent = report.content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>')
+                .replace(/•/g, '&bull;');
 
-        reportElement.innerHTML = `
-            <h3>${report.file}</h3>
-            <div class="report-content">${formattedContent}</div>
-        `;
+            reportElement.innerHTML = `
+                <h3>${report.file}</h3>
+                <div class="report-content">${formattedContent}</div>
+            `;
 
-        reportsContainer.appendChild(reportElement);
-        reportElement.scrollIntoView({ behavior: 'smooth' });
-    }
+            reportsContainer.appendChild(reportElement);
+            reportElement.scrollIntoView({ behavior: 'smooth' });
+        }
 
-    function showError(message) {
-        const errorDiv = document.querySelector('.error');
-        errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
-        errorDiv.style.padding = '1rem';
-        errorDiv.style.marginTop = '1rem';
-        errorDiv.style.backgroundColor = 'rgba(252, 129, 129, 0.1)';
-        errorDiv.style.border = '1px solid rgba(252, 129, 129, 0.2)';
-        errorDiv.style.borderRadius = '0.5rem';
-    }
+        function showError(message) {
+            const errorDiv = document.querySelector('.error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            errorDiv.style.padding = '1rem';
+            errorDiv.style.marginTop = '1rem';
+            errorDiv.style.backgroundColor = 'rgba(252, 129, 129, 0.1)';
+            errorDiv.style.border = '1px solid rgba(252, 129, 129, 0.2)';
+            errorDiv.style.borderRadius = '0.5rem';
+        }
 
-    function clearError() {
-        const errorDiv = document.querySelector('.error');
-        errorDiv.textContent = '';
-        errorDiv.style.display = 'none';
-    }
-</script>
+        function clearError() {
+            const errorDiv = document.querySelector('.error');
+            errorDiv.textContent = '';
+            errorDiv.style.display = 'none';
+        }
+    </script>
 </body>
 </html>
