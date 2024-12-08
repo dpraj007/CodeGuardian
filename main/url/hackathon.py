@@ -1,12 +1,24 @@
-from .helper import build_tree, tree_to_string, build_file_content_dict, get_github_files, get_file_content, parse_github_url, build_tree_from_github_files
+from .helper import build_tree, tree_to_string, build_file_content_dict, get_github_files, get_file_content, parse_github_url, build_tree_from_github_files ,build_file_content_dict_local
+
+# def get_local_file_and_content(folder_path):
+#     tree = build_tree(folder_path)
+#     file_content_dict = build_file_content_dict(folder_path)
+#     folder_structure = tree_to_string(tree)
+
+#     print(file_content_dict)
+#     return folder_structure, file_content_dict
+
+
 
 def get_local_file_and_content(folder_path):
     tree = build_tree(folder_path)
-    file_content_dict = build_file_content_dict(folder_path)
+    # This should return a dict of {relative_file_path: file_content}
+    result = build_file_content_dict_local(folder_path)
     folder_structure = tree_to_string(tree)
 
-    print(file_content_dict)
-    return folder_structure, file_content_dict
+    # Return in the same format as get_github_file_and_content
+    return folder_structure, result
+
 
 def get_github_file_and_content(repo_url):
     owner, repo, branch = parse_github_url(repo_url)

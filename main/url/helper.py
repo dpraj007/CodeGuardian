@@ -174,6 +174,35 @@ def build_file_content_dict(folder_path):
 
     return file_content_dict
 
+
+
+import os
+
+def build_file_content_dict_local(folder_path):
+    file_content_dict = {}
+
+    try:
+        for entry in os.listdir(folder_path):
+            entry_path = os.path.join(folder_path, entry)
+
+            if os.path.isdir(entry_path) and entry != ".git":
+                # Recursively process subdirectories
+                file_content_dict.update(build_file_content_dict_local(entry_path))
+            elif os.path.isfile(entry_path) and matches_extension(entry):
+                # Read and store the file content with only the file name as the key
+                try:
+                    with open(entry_path, 'r', encoding='utf-8') as file:
+                        file_name = os.path.basename(entry_path)
+                        file_content_dict[file_name] = file.read()
+                except Exception as e:
+                    print(f"An error occurred while reading {entry_path}: {e}")
+
+    except Exception as e:
+        print(f"An error occurred while accessing {folder_path}: {e}")
+
+    return file_content_dict
+
+
 def parse_github_url(url):
     pattern = r"https://github.com/(?P<owner>[\w\-]+)/(?P<repo>[\w\-]+)(/tree/(?P<branch>[\w\-]+))?"
     match = re.match(pattern, url)
