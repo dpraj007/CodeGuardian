@@ -1,0 +1,13 @@
+{
+    "name": "rag-chat-app-js",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+      "start": "node server.js"
+    },
+    "dependencies": {
+      "@lmstudio/sdk": "latest",
+      "express": "latest"
+    }
+  }
+  

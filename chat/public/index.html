@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Chat with your Code Vulnerability Reports</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #1e1e1e; /* Dark background */
+    margin: 0;
+    padding: 0;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  header {
+    padding: 1rem;
+    background: #2d2d2d;
+    border-bottom: 1px solid #444;
+    text-align: center;
+  }
+
+  header h1 {
+    margin: 0;
+    font-weight: normal;
+    font-size: 1.5rem;
+    color: #3ddc97; /* A highlight color */
+  }
+
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+  .intro-text {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    color: #cccccc;
+  }
+
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    border: 1px solid #444;
+    border-radius: 5px;
+    overflow: hidden;
+    background: #2d2d2d;
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  .message {
+    margin-bottom: 1rem;
+  }
+
+  .message.user {
+    text-align: right;
+    color: #3ddc97;
+  }
+
+  .message.assistant {
+    text-align: left;
+    color: #ffffff;
+  }
+
+  .message p {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    background: #3a3a3a;
+    margin: 0;
+    max-width: 70%;
+    word-wrap: break-word;
+  }
+
+  .message.user p {
+    background: #3ddc9733;
+    color: #3ddc97;
+    border: 1px solid #3ddc97;
+  }
+
+  .input-area {
+    display: flex;
+    border-top: 1px solid #444;
+    padding: 0.5rem;
+    background: #2d2d2d;
+  }
+
+  .input-area input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: #3a3a3a;
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+  }
+
+  .input-area button {
+    background: #3ddc97;
+    color: #1e1e1e;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .input-area button:hover {
+    background: #35c889;
+  }
+
+  .status {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #cccccc;
+    margin-top: 1rem;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    background: #2d2d2d;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #3a3a3a;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Chat with your Code Vulnerability Reports</h1>
+</header>
+<main>
+  <div class="intro-text">
+    Connect with your code's vulnerability reports. Ask questions about potential security issues,<br>
+    CVSS scores, or any details found in your <code>.md</code> reports.
+  </div>
+  <div class="chat-container">
+    <div class="messages" id="messages">
+      <!-- Messages will be appended here -->
+    </div>
+    <div class="input-area">
+      <input type="text" id="questionInput" placeholder="Type your question..." />
+      <button id="sendBtn">Send</button>
+    </div>
+  </div>
+  <div class="status" id="status"></div>
+</main>
+<script>
+const messagesDiv = document.getElementById("messages");
+const questionInput = document.getElementById("questionInput");
+const sendBtn = document.getElementById("sendBtn");
+const statusDiv = document.getElementById("status");
+
+async function sendMessage() {
+  const question = questionInput.value.trim();
+  if (!question) return;
+
+  // Append user message
+  appendMessage("user", question);
+  questionInput.value = "";
+
+  // Show thinking status
+  statusDiv.textContent = "Thinking...";
+
+  const response = await fetch("/ask", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question })
+  });
+
+  if (!response.ok) {
+    appendMessage("assistant", "Error retrieving the answer.");
+    statusDiv.textContent = "";
+    return;
+  }
+
+  const data = await response.json();
+  appendMessage("assistant", data.answer || "No answer returned.");
+  statusDiv.textContent = "";
+  scrollToBottom();
+}
+
+function appendMessage(role, text) {
+  const messageEl = document.createElement("div");
+  messageEl.className = `message ${role}`;
+  
+  const p = document.createElement("p");
+  p.textContent = text;
+  messageEl.appendChild(p);
+
+  messagesDiv.appendChild(messageEl);
+  scrollToBottom();
+}
+
+function scrollToBottom() {
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+sendBtn.addEventListener("click", sendMessage);
+
+questionInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    sendMessage();
+  }
+});
+</script>
+</body>
+</html>
